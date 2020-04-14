@@ -1,0 +1,29 @@
+image: node:12.1.0-alpine 
+
+stages:
+- test
+- deploy
+
+test:
+  stage: test
+  script:
+    - npm ci
+    - npm test
+  coverage: '/Statements.*?(\d+(?:\.\d+)?)%/'
+  artifacts:
+    paths:
+      - coverage/
+
+pages:
+  stage: deploy
+  dependencies:
+    - test
+  script:
+    - mv coverage/ public/
+  artifacts:
+    paths:
+      - public
+    expire_in: 30 days
+  only:
+    - master
+
